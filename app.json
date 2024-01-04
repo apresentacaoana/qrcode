@@ -1,13 +1,63 @@
 {
   "expo": {
+    "name": "Postos Kotinski",
     "scheme": "acme",
+    "orientation": "portrait",
     "web": {
       "bundler": "metro"
     },
+    "slug": "postos-kotinski",
+    "version": "2.0.0",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#262626"
+    },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ],
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
     ],
-    "name": "kotinski-remake",
-    "slug": "kotinski-remake"
+    "android": {
+      "versionCode": 1,
+      "package": "com.alexfrocha.postoskotinski",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#262626"
+      }
+    },
+    "ios": {
+      "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#262626"
+      },
+      "bundleIdentifier": "com.alexfrocha.postoskotinski"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "8d62a1f1-c427-49b2-afa9-dce1ca5e2c09"
+      }
+    }
   }
 }
