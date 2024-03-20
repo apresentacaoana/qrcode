@@ -44,6 +44,8 @@ const Plans = () => {
         <SafeAreaView className="flex-1 w-full  bg-[#fefefe]">
             <StatusBar />
 
+            
+
                 {(!user.plan && !user.subscription_date) ? (
                     <>
                     <StatusBar />
@@ -52,7 +54,11 @@ const Plans = () => {
                         <Text className="font-bold text-[18px] text-[#0f0d3c]">Postos Kotinski</Text>
                     </View>
                     <ScrollView className=" mx-7 my-20">
-                        {data.map((item) => (
+                        
+                        <Widget className>
+                            <Text className="text-center">Função em construção.</Text>
+                        </Widget>
+                        {/* {data.map((item) => (
                             
                             <Widget className={`mb-10 self-center justify-self-center w-full`}>
                                 <View className="flex flex-row justify-between items-center">
@@ -71,7 +77,7 @@ const Plans = () => {
                                     </Widget>
                                 </TouchableOpacity>
                             </Widget>
-                        ))}
+                        ))} */}
                     </ScrollView>
                     </>
                     

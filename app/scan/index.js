@@ -73,7 +73,7 @@ const Scan = ({setPageType}) => {
                                     venda.status == 'pago' ? (
 
                                         <Widget variant={"filled"} className={"mt-5 mb-2"}>
-                                            <Text className="text-center text-[20px] font-bold">O QRCode que acaba de verificar já foi pago.</Text>
+                                            <Text className="text-center text-[20px] font-bold text-white">O QRCode que acaba de verificar já foi pago.</Text>
                                         </Widget>
 
                                     ) : (
@@ -102,7 +102,7 @@ const Scan = ({setPageType}) => {
                                             </Widget>
                                             <TouchableOpacity onPress={handleConfirm} className>
                                                 <Widget variant={"filled"}>
-                                                    <Text className="font-bold text-center">Confirmar</Text>
+                                                    <Text className="font-bold text-center text-white">Confirmar</Text>
                                                 </Widget>
                                             </TouchableOpacity>
                                         </>
@@ -111,7 +111,7 @@ const Scan = ({setPageType}) => {
                          </>
                         ): (
                             <Widget variant={"filled"} className={"mt-5 mb-2"}>
-                                <Text className="text-center text-[20px] font-bold">O QRCode que acaba de verificar não consta em nosso sistema.</Text>
+                                <Text className="text-center text-[20px] font-bold text-white">O QRCode que acaba de verificar não consta em nosso sistema.</Text>
                             </Widget>
                         )}
                     </>

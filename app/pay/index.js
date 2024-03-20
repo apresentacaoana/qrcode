@@ -174,7 +174,7 @@ const GenerateQR = () => {
                             <View className=" w-full">
                                 <Text className="text-[#0f0d3c]">Quantidade (Litros)</Text>
                                 <TextInput keyboardType="numeric" value={litros} onChangeText={(text) => handleLitrosChange(text)} placeholder="50" placeholderTextColor={"#EDEDED"} className="border-b-[2px] border-b-gray-500 w-full text-[50px] text-[#0f0d3c]" />
-                                <Text className="text-[#0f0d3c] mt-1">Seu saldo: {user.litros + user.bonus} Litros</Text>
+                                <Text className="text-[#0f0d3c] mt-1">Seu saldo: {user.litros + user.bonus.toFixed(2)} Litros</Text>
                             </View>
                             <TouchableOpacity onPress={generateCode} className={"mt-10 w-full"}>
                                 <Widget variant={"filled"}>

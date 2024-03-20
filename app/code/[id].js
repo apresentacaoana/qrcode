@@ -33,7 +33,7 @@ const CODEPage = () => {
                 bonus: user.bonus + object.detalhes.litrosUsadosBonus
             })
         }
-        router.replace()
+        router.replace('/home')
     }
 
     useEffect(() => {

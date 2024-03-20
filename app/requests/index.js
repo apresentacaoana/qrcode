@@ -38,7 +38,7 @@ const Requests = () => {
             <Stack.Screen options={{headerShown: false}} />
             <View className="flex-1 m-7">
 
-                    <View className="flex flex-row mb-10">
+                    <View className="flex flex-row mb-5 mt-7">
                         <TouchableOpacity onPress={() => router.back()}>
                             <Ionicons name="arrow-back" color={"#0f0d3c"} size={30} />
                         </TouchableOpacity>

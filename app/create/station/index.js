@@ -41,21 +41,42 @@ const CreateStation = () => {
     }
 
     const handleSearch = async (e) => {
-        axios.get(`https://api.geoapify.com/v1/geocode/autocomplete?text=${e}}&apiKey=fb9f181a103b4fe688ba54b1665a40d2`)
-        .then((response) => {
-            let data = response.data
-            setAddresses(data.features)
-        })
+        if(e.length >= 3) {
+            axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${e}&language=pt-BR&types=geocode&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
+            .then((response) => {
+                let data = response.data
+                console.log(data.predictions)
+                setAddresses(data.predictions)
+            })
+        }
     }
 
     const handleSelect = async (item) => {
-        setCep(item.properties.postcode.replace('-', ''))
-        setCidade(item.properties.city)
-        setEndereco(item.properties.street)
-        setBairro(item.properties.suburb)
-        setEstado(item.properties.state)
-        setSelectedAddress(item)
-    }
+
+        axios.get(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=address_components&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
+        .then((response) => {
+            let {result} = response.data
+            let {address_components} = result
+            console.log(result["address_components"][5]["long_name"])
+             
+            let endereco = address_components[0]["long_name"]
+            let bairro = address_components[1]["long_name"]
+            let cidade = address_components[2]["long_name"]
+            let estado = address_components[3]["long_name"]
+            let cep = address_components[5]["long_name"]
+            let pais = address_components[4]["long_name"]
+
+            setCep(cep);
+            setCidade(cidade);
+            setEndereco(endereco);
+            setBairro(bairro);
+            setEstado(estado);
+            setSelectedAddress(item);
+        })
+      
+      }
+      
+      
 
     const handleSubmit = async () => {
         setAlerta("")
@@ -67,6 +88,8 @@ const CreateStation = () => {
             setAlerta("Envie ao menos a logo")
             return
         }
+
+        
 
         let id = getId()
         const blob = await new Promise((resolve, reject) => {
@@ -96,23 +119,31 @@ const CreateStation = () => {
             let resultsInBrazil = results.filter(result => {
                 return result.address.countryCode === "BR";
             });
+            
 
             if (resultsInBrazil.length > 0) {
                 let { position } = resultsInBrazil[0];
-                await novoPosto({
-                    nome,
-                    logo: photoURL,
-                    combustiveis,
-                    descricao: "",
-                    bairro,
-                    cidade,
-                    estado,
-                    endereco,
-                    cep,
-                    lat: position.lat,
-                    lng: position.lon
-                });
-                router.replace("/home");
+
+                axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.lat},${position.lon}&radius=5000&type=gas_station&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
+                .then(async (responseStation) => {
+                    let {results} = responseStation.data
+                    let stationPosition = results.find(objeto => objeto.name.toLowerCase().includes(nome.toLowerCase()))
+                    await novoPosto({
+                        nome,
+                        logo: photoURL,
+                        combustiveis,
+                        descricao: "",
+                        bairro,
+                        cidade,
+                        estado,
+                        endereco,
+                        cep,
+                        lat: Object.keys(stationPosition).length > 0 ? stationPosition.geometry.location.lat : position.lat,
+                        lng: Object.keys(stationPosition).length > 0 ? stationPosition.geometry.location.lng : position.lon
+                    });
+                    router.replace("/home");
+                })  
+
             } else {
                 // console.log("Nenhum resultado no Brasil encontrado.");
             }
@@ -180,7 +211,7 @@ const CreateStation = () => {
                 
                 {alerta && (
                     <Widget variant={"filled"} className={"mt-3"}>
-                        <Text>{alerta}</Text>
+                        <Text className="text-white">{alerta}</Text>
                     </Widget>
                 )}
                 
@@ -223,26 +254,24 @@ const CreateStation = () => {
                     </View>
                 </View>
                 {(Object.keys(selectedAddress).length > 0) && (
-                    <TouchableOpacity className="mb-2">
-                    <Widget variant={"filled"}>
-                        <Text className="text-[15px] mb-2 text-white font-extrabold">ENDEREÇO SELECIONADO</Text>
-                        <Text className="text-[18px] text-white font-bold">{selectedAddress["properties"]["street"]}</Text>
-                        <Text className="text-[15px] text-white">{selectedAddress["properties"]["suburb"]}, {selectedAddress["properties"]["city"]} - {selectedAddress["properties"]["state_code"]}, {selectedAddress["properties"]["postcode"]}, {selectedAddress["properties"]["country"]}</Text>
-                    </Widget>
+                    <TouchableOpacity onPress={() => setSelectedAddress({})} className="mb-2">
+                        <Widget variant={"filled"}>
+                            <Text style={{ fontSize: 15, marginBottom: 8, color: 'white', fontWeight: 'bold' }}>ENDEREÇO SELECIONADO</Text>
+                            <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold' }}>{selectedAddress ? selectedAddress.terms[0].value : ''}</Text>
+                            <Text style={{ fontSize: 15, color: 'white' }}>
+                                {selectedAddress ? `${selectedAddress.terms[1].value}, ${selectedAddress.terms[2].value} - ${selectedAddress.terms[3].value}, ${selectedAddress.terms[4].value}` : ''}
+                            </Text>
+                        </Widget>
+
                     </TouchableOpacity>
                 )}
-                {(addresses.length > 0) && addresses.map((item) => (
-                    <>
-                        {(item["properties"]["suburb"] && item["properties"]["city"] && item["properties"]["state_code"] && item["properties"]["postcode"] && item["properties"]["country"]) && (
-                            
-                            <TouchableOpacity onPress={() => handleSelect(item)} className="mb-2">
-                                <Widget>
-                                    <Text className="text-[18px] text-[#0f0d3c] font-bold">{item["properties"]["street"]}</Text>
-                                    <Text className="text-[15px] text-[#0f0d3c]">{item["properties"]["suburb"]}, {item["properties"]["city"]} - {item["properties"]["state_code"]}, {item["properties"]["postcode"]}, {item["properties"]["country"]}</Text>
-                                </Widget>
-                            </TouchableOpacity>
-                        )}
-                    </>
+                {addresses.length > 0 && addresses.map((item) => (
+                  <TouchableOpacity key={item.place_id} onPress={() => handleSelect(item)} className="mb-2">
+                    <Widget>
+                      <Text style={{ fontSize: 18, color: '#0f0d3c', fontWeight: 'bold' }}>{item.structured_formatting.main_text}</Text>
+                      <Text style={{ fontSize: 15, color: '#0f0d3c' }}>{item.structured_formatting.secondary_text}</Text>
+                    </Widget>
+                  </TouchableOpacity>
                 ))}
                 {/* <View className="mb-[12px] text-[#0f0d3c]">
                     <Text className="text-[16px] text-[#0f0d3c] font-normal my-[8px]">

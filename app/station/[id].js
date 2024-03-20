@@ -36,9 +36,10 @@ const Station = () => {
         }
         getData()
     }, [])
+    
 
     const goMap = () => {
-        openMap({latitude: station.lat, longitude: station.lng, zoom: 18})
+        openMap({latitude: station.lat, longitude: station.lng, zoom: 19})
     }
 
     async function handleRequest() {
@@ -72,9 +73,6 @@ const Station = () => {
                             <TouchableOpacity onPress={() => setPayType("debit")} className={`grow rounded-[3px] ${payType == "debit" && "bg-[#0f0d3c]"} p-2 items-center`}>
                                 <Text className={`${payType != "debit" && "text-white"} font-semibold text-white`}>Dinheiro/Pix/Débito</Text>
                             </TouchableOpacity>
-                            {/* <TouchableOpacity onPress={() => setPayType("credit")} className={`grow rounded-[3px] ${payType == "credit" && "bg-orange-400"} p-2 items-center`}>
-                                <Text className={`${payType != "credit" && "text-[#0f0d3c]"} font-semibold`}>Crédito</Text>
-                            </TouchableOpacity> */}
                         </View>
 
 
@@ -117,7 +115,7 @@ const Station = () => {
                 )}
                 </View>
                 
-                <TouchableOpacity onPress={goMap} className="mt-4">
+                <TouchableOpacity onPress={() => router.push({pathname: `/mapa`, params: {lat: station.lat, lng: station.lng}})} className="mt-4">
                     <Widget variant={"filled"}>
                         <Text className="font-semibold text-white text-center">Ver no Mapa</Text>
                     </Widget>

@@ -56,7 +56,7 @@ const MyBonus = () => {
                 const bonusMes = bonus.mes;
         
                 const mesIgual = bonusMes === usuarioMesNascimento || bonusMes === 'qualquer um';
-                const generoIgual = bonus.genero === usuario.genero || bonus.genero === 'Ambos';
+                const generoIgual = bonus.genero === usuario.genero || (bonus.genero === 'Ambos' || bonus.genero === 'Outro');
         
                 return mesIgual && generoIgual;
             } catch (error) {

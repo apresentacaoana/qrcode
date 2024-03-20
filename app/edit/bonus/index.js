@@ -116,7 +116,7 @@ const EditBonusPage = () => {
                         Para quem quer que seja esse bônus?
                     </Text>
                     <RadioButtons
-                        options={["Ambos", "Homem", "Mulher"]}
+                        options={["Ambos", "Homem", "Mulher", "Outro"]}
                         selectedOption={genero}
                         renderOption={(option) => (
                             <TouchableOpacity onPress={() => setGenero(option)} className={`px-5 py-3 mb-2 rounded-[8px] border ${genero == option ? "border-[#0f0d3c] bg-[#0f0d3c] text-white" : "border-[#A0A0A0]"}`}>

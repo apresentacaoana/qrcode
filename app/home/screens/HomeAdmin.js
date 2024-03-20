@@ -116,6 +116,12 @@ const HomeAdmin = ({ user, setUser }) => {
                         <Text className="text-[15px] text-white">Você está logado como</Text>
                         <Text className="font-bold text-white text-[30px]">Admin</Text>
                     </Widget>
+                    <TouchableOpacity onPress={() => router.push('chats')}>
+                        <Widget variant={"filled"} className={"mb-2"}>
+                            <Text className="text-[15px] text-white">Suporte</Text>
+                            <Text className="font-bold text-white text-[30px]">Ver chats</Text>
+                        </Widget>
+                    </TouchableOpacity>
                     <Widget className={"mb-2"}>
                         <View className="flex mb-3 flex-row justify-between items-center">
                             <Text className="text-[#0f0d3c] text-[18px] font-bold">Solicitações</Text>
@@ -249,6 +255,14 @@ const HomeAdmin = ({ user, setUser }) => {
                         <View className="flex mb-3 flex-row justify-between items-center">
                             <Text className="text-[#0f0d3c] text-[18px] font-bold">Frentistas</Text>
                             <TouchableOpacity onPress={() => router.push("/frentistas")}>
+                                <Text className="text-[#0f0d3c] text-[14px]">Ver</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Widget>
+                    <Widget className={"mb-2"}>
+                        <View className="flex mb-3 flex-row justify-between items-center">
+                            <Text className="text-[#0f0d3c] text-[18px] font-bold">Usuários</Text>
+                            <TouchableOpacity onPress={() => router.push("/users")}>
                                 <Text className="text-[#0f0d3c] text-[14px]">Ver</Text>
                             </TouchableOpacity>
                         </View>

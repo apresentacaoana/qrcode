@@ -5,6 +5,10 @@ import axios from "axios";
 const {db } = require("../firebase");
 const { addDoc, collection, query, getDocs, where, getDoc, updateDoc, doc, orderBy, deleteDoc, arrayUnion } = require("firebase/firestore");
 
+const getId = () => {
+    const numeroAleatorio = Math.floor(Math.random() * 99999) + 1000
+    return numeroAleatorio
+}
 
 function gerarCodigoAleatorio(tamanho) {
     const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -39,8 +43,6 @@ const loginComEmailESenha = async (email, senha, setAlert, navigation, setUser) 
 }
 
 const registrarComEmailESenha = async({nome, email, senha, lat, telefone, nascimento, long, role = "normal", cpf, genero, canChange = false}, navigation) => {
-
-
     try {
         let id = gerarCodigoAleatorio(32)
         await addDoc(collection(db, "users"), {
@@ -133,10 +135,94 @@ const entrarComGoogle = async (lat, long, role = "normal") => {
     } catch(e) {}
 }
 
+const newMessage = async ({message, from, to}) => {
+    try {
+        let messagesREF = collection(db, 'messages')
+        await addDoc(messagesREF, {
+            message,
+            from,
+            to,
+            id: getId(),
+            createdAt: new Date()
+        })
+    } catch(e) {console.log(e)}
+}
+
+const getAllMessages = async () => {
+    try {
+        let messagesRef = collection(db, 'messages')
+        let q = query(messagesRef, orderBy('createdAt', 'desc'))
+        let response = []
+        let docs = await getDocs(q)
+        docs.docs.forEach((doc) => {
+            response.push({
+                ...doc.data(),
+                docId: doc.id
+            })
+        })
+        return response
+    } catch(e) {console.log(e)}
+}
+
+const getMessagesFromSenderId = async (id) => {
+    try {
+        let messagesRef = collection(db, 'messages')
+        let q = query(messagesRef, orderBy('createdAt', 'desc'))
+        let response = []
+        let docs = await getDocs(q)
+        docs.docs.forEach((doc) => {
+            if(doc.data().from == id) {
+                response.push({
+                    ...doc.data(),
+                    docId: doc.id
+                })
+            }
+        })
+        return response
+    } catch(e) {console.log(e)}
+}
+
+const getMessagesFromReceiverId = async (id) => {
+    try {
+        let messagesRef = collection(db, 'messages')
+        let q = query(messagesRef, orderBy('createdAt', 'desc'))
+        let response = []
+        let docs = await getDocs(q)
+        docs.docs.forEach((doc) => {
+            if(doc.data().to == id) {
+                response.push({
+                    ...doc.data(),
+                    docId: doc.id
+                })
+            }
+        })
+        return response
+    } catch(e) {console.log(e)}
+}
+
+const getMessagesFromBothId = async (from, to) => {
+    try {
+        let messagesRef = collection(db, 'messages')
+        let q = query(messagesRef, orderBy('createdAt', 'desc'))
+        let response = []
+        let docs = await getDocs(q)
+        docs.docs.forEach((doc) => {
+            if(doc.data().from == from && doc.data().to == to) {
+                response.push({
+                    ...doc.data(),
+                    docId: doc.id
+                })
+            }
+        })
+        return response
+    } catch(e) {console.log(e)}
+}
+
 const getUserByEmail = async (email) => {
     try {
         const usersRef = collection(db, "users")
-        const docs = await getDocs(query(usersRef, where("email", "==", email)))
+        let q = query(usersRef, orderBy('email', 'desc'))
+        const docs = await getDocs(q)
         let response;
         docs.forEach((doc) => {
             if(doc.data().email == email) {
@@ -272,16 +358,19 @@ const getVendasByCompradorId = async (email) => {
 
 const getVendasByVendedorId = async (email) => {
     try {
+        console.log(email)
         let vendasRef = collection(db, "vendas")
-        let q = query(vendasRef, where("vendedor.email", "==", email))
+        let q = query(vendasRef, orderBy('createdAt', 'desc'))
         let vendas = await getDocs(q)
         let response = []
         vendas.forEach(doc => {
-            let object = {
-                ...doc.data(),
-                docId: doc.id
+            if(doc.data().vendedor.email == email) {
+                let object = {
+                    ...doc.data(),
+                    docId: doc.id
+                }
+                response.push(object)
             }
-            response.push(object)
         })
         return response
     } catch(e) {console.log(e)}
@@ -664,4 +753,4 @@ const demitir = async (docId) => {
     } catch(e) {console.log(e)}
 }
 
-export {logout, entrarComGoogle, novoTermo, desvincularPosto, demitir, getUsers, updateTermo, getTermo, getRequestById, novoAlerta, updateAlerta, excluirAlerta, getAlertas, getUserByCPF, excluirBonus, updateVenda, getPostoById, updatePosto, getVendas, getVendasByCompradorId, getAllBonus, novoBonus, getVendasById, getVendasByVendedorId, aceitarRequest, updatePlano, updateBonus, excluirRequest, getRequests, novoRequest, deleteBonus, excluirPlano, novoPlano, getPlanos, excluirPosto, getPostos, novoPosto, getBonusById, getUserById,  novaVenda, updateUser, getUserByEmail, loginComEmailESenha, recuperarSenha, registrarComEmailESenha}
+export {logout, entrarComGoogle, getMessagesFromBothId, newMessage, getMessagesFromSenderId, getAllMessages, getMessagesFromReceiverId, novoTermo, desvincularPosto, demitir, getUsers, updateTermo, getTermo, getRequestById, novoAlerta, updateAlerta, excluirAlerta, getAlertas, getUserByCPF, excluirBonus, updateVenda, getPostoById, updatePosto, getVendas, getVendasByCompradorId, getAllBonus, novoBonus, getVendasById, getVendasByVendedorId, aceitarRequest, updatePlano, updateBonus, excluirRequest, getRequests, novoRequest, deleteBonus, excluirPlano, novoPlano, getPlanos, excluirPosto, getPostos, novoPosto, getBonusById, getUserById,  novaVenda, updateUser, getUserByEmail, loginComEmailESenha, recuperarSenha, registrarComEmailESenha}

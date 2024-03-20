@@ -111,7 +111,7 @@ const Extract = () => {
                     {user.bonus !== 0 && (
                         <View className={"flex flex-row p-2 bg-[#0f0d3c] rounded-[10px] min-w-[100px] max-w-[110px] justify-center items-center"}>
                             <Ionicons size={20} name="gift" color={"white"} />
-                            <Text className="font-black ml-1 text-[20px] text-white">{user.bonus}L</Text>
+                            <Text className="font-black ml-1 text-[20px] text-white">{user.bonus.toFixed(2)}L</Text>
                         </View>
                     )}
                     
@@ -119,7 +119,7 @@ const Extract = () => {
                 <Widget className={"flex mt-2 flex-col"}>
                     <Text className="text-[#0f0d3c]">Você já economizou</Text>
                     <View className="flex flex-row items-end -mt-1">
-                        <Text className="text-[#0f0d3c] font-bold text-[42px]">R${calcularEconomiaTotal(sales.filter((item) => item.status == 'pago'))}</Text>
+                        <Text className="text-[#0f0d3c] font-bold text-[42px]">R${calcularEconomiaTotal(sales.filter((item) => item.status == 'pago')).toFixed(2)}</Text>
                     </View>
                 </Widget>
                 <Widget className={"my-2"}>

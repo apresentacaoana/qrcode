@@ -16,8 +16,6 @@ import LOGO from '../../../assets/logo-bg.png'
 
 
 const Config = () => {
-
-
     const [pageType, setPageType] = useState("")
     const [user, setUser] = useContext(UserContext)
     const router = useRouter()
@@ -33,10 +31,10 @@ const Config = () => {
             ...user,
             role: user.role == "frentista" ? "normal" : "frentista"
         })
-        router.replace('/')
         updateUser(user.docId, {
             role: user.role == "frentista" ? "normal" : "frentista"
         })
+        router.replace('/login')
     }
 
 
@@ -88,12 +86,12 @@ const Config = () => {
                             <Text className="text-[#0f0d3c] ml-4">Termos de Segurança e LGPD</Text>
                         </Widget>
                     </TouchableOpacity>
-                    {/* <TouchableOpacity onPress={() => router.push('/mybonus')} className="mb-2">
+                    <TouchableOpacity onPress={() => router.push('/suporte')} className="mb-2">
                         <Widget className={"flex flex-row items-center "}>
-                            <FontAwesome name="gift" color={"#0f0d3c"} size={20} />
-                            <Text className="text-[#0f0d3c] ml-4">Bônus</Text>
+                            <FontAwesome name="comments" color={"#0f0d3c"} size={20} />
+                            <Text className="text-[#0f0d3c] ml-4">Suporte</Text>
                         </Widget>
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={logout} className="mb-2">
                         <Widget className={"flex flex-row items-center "}>
                             <FontAwesome name="sign-out" color={"#0f0d3c"} size={20} />

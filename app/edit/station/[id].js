@@ -157,7 +157,7 @@ const EditStation = () => {
                 
                 {alerta && (
                     <Widget variant={"filled"} className={"mt-3"}>
-                        <Text>{alerta}</Text>
+                        <Text className="text-white">{alerta}</Text>
                     </Widget>
                 )}
                 

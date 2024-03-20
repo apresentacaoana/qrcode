@@ -25,30 +25,33 @@ const HomeFrentista = ({ user, setUser }) => {
 
     useEffect(() => {
         async function getData() {
-            let responseUser = await getUserByEmail(user.email)
-            let specificPosto = await getPostoById(responseUser.posto.id)
+            try {
+                let responseUser = await getUserByEmail(user.email)
+                let specificPosto = await getPostoById(await responseUser.posto.id)
+                
+                setUser(responseUser)
+                if(Object.keys(specificPosto).length == 0) {
+                    setUser({
+                        ...user,
+                        posto: {}
+                    })
+                    await updateUser(user.docId, {
+                        posto: {}
+                    })
+                }
+                let postos = await getPostos()
+                setStations(postos.slice(0, 5))
+                let response = await getVendasByVendedorId(user.email)
+                setSales(response.filter((item) => item.status == 'pago'))
+                let apenasValores = sales.map(item => item.valor)
+                let soma = apenasValores.reduce((acc, valor) => acc + valor, 0)
+                setAlreadySold(soma)
 
+                setRefreshing(false)
+                setLoading(false)
+            } catch(err) {console.log(err)
+            } finally {setLoading(false)}
 
-            setUser(responseUser)
-            if(Object.keys(specificPosto).length == 0) {
-                setUser({
-                    ...user,
-                    posto: {}
-                })
-                await updateUser(user.docId, {
-                    posto: {}
-                })
-            }
-            let postos = await getPostos()
-            setStations(postos.slice(0, 5))
-            let response = await getVendasByVendedorId(user.email)
-            setSales(response.filter((item) => item.status == 'pago'))
-            let apenasValores = sales.map(item => item.valor)
-            let soma = apenasValores.reduce((acc, valor) => acc + valor, 0)
-            setAlreadySold(soma)
-
-            setRefreshing(false)
-            setLoading(false)
         }
         getData()
     }, [reload])

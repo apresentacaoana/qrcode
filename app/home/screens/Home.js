@@ -104,11 +104,6 @@ const Home = () => {
     const handleAlerts = async (alertas) => {
         const alertaVistoId = await AsyncStorage.getItem("viewed");
         alertas.forEach(async (alerta, index) => {
-            // const dataCriacao = moment(getTimestamp(alerta.createdAt)).format('L');
-            // const dataAtual = moment().format('L');
-            // const diferencaEmDias = moment(dataAtual, 'L').diff(moment(dataCriacao, 'L'), 'days');
-            // if (index === 0 && (alertaVistoId !== alerta.docId)) {
-            // }
             
             let alertaVisto = await AsyncStorage.getItem('viewed')
             let alert;
@@ -255,7 +250,7 @@ const Home = () => {
                                         {(user.bonus != 0) && (
                                             <View className={"flex flex-row p-2 bg-[#0f0d3c] rounded-[10px] min-w-[100px] max-w-[110px] justify-center items-center"}>
                                                 <Ionicons size={20} name="gift" color={"white"} />
-                                                <Text className="font-black ml-1 text-white text-[20px]">{user.bonus}L</Text>
+                                                <Text className="font-black ml-1 text-white text-[20px]">{user.bonus.toFixed(2)}L</Text>
                                             </View>
                                         )}
                                     </Widget>
