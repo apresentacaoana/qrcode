@@ -34,7 +34,7 @@ const Config = () => {
         updateUser(user.docId, {
             role: user.role == "frentista" ? "normal" : "frentista"
         })
-        router.replace('/login')
+        router.replace({pathname: "/login", params: {aviso: "O modo da sua conta foi trocado! Logue novamente."}})
     }
 
 

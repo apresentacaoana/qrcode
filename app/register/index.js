@@ -72,6 +72,7 @@ const Register = () => {
         let userByCpf = await getUserByCPF(cpf)
         if(userByCpf) return setAlert("Este CPF já está sendo utilizado")
         if(!terms) return setAlert("Aceite os termos e condições para continuar")
+        const url = `https://frochap.vercel.app/api/sendemail`;
         await registrarComEmailESenha({nome, email: email.toLowerCase(), senha, telefone, nascimento, lat: 12, long: 12, role: isCheck ? "frentista" : "normal", cpf, genero}, router)
     }
 
@@ -237,8 +238,7 @@ const Register = () => {
                         className="mr-[8px]"
                         defaultValue={terms}
                         onValueChange={setTerms}
-                        
-                        color={terms ? COLORS.primary : undefined}
+                        color={terms ? COLORS.primary : "#ff0000"}
                     />
                     <TouchableOpacity onPress={() => router.push('/terms')}>
                         <Text className="text-[#0f0d3c]">Aceito os <Text className="font-extrabold">Termos e Condições</Text></Text>

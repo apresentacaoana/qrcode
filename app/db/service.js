@@ -66,24 +66,25 @@ const registrarComEmailESenha = async({nome, email, senha, lat, telefone, nascim
             litros: 100,
             bonus: 0,
             posto: {}
-        })
-
-        const dados = {
-            email: id,
-            nome,
-            sendType: 'confirm'
-        };
-        navigation.push({pathname: "/login", params: {aviso: "Verifique seu email e ative sua conta!"}})
-        
-        const url = `https://frochap.vercel.app/api/sendemail`;
-        console.log(dados)
-        await axios.post(url, dados)
+        }).then(async () => {
+            console.log('usuário criado, o id é: ' + id)
+            const dados = {
+                email: id,
+                nome,
+                sendType: 'confirm'
+            };
+            
+            const url = `https://frochap.vercel.app/api/sendemail`;
+            await axios.post(url, dados)
             .then(response => {
                 console.log(response.data)
+                navigation.push({pathname: "/login", params: {aviso: "Verifique seu email e ative sua conta!"}})
             })
             .catch(error => {
                 console.error('Erro na requisição:', error);
             });
+        })
+
         
     } catch(e) {console.log(e)}
 }
