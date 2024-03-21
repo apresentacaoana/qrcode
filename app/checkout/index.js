@@ -17,7 +17,7 @@ const Checkout = () => {
         <>
             <Stack.Screen options={{headerTitle: "Pagamento"}} />
             <WebView 
-                source={{ uri: `https://frochap.vercel.app/?planoId=${planoId}&userId=${userId}`}}
+                source={{ uri: `https://master--frochap.netlify.app/?planoId=${planoId}&userId=${userId}`}}
                 onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
             />
         </>

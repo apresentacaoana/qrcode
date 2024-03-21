@@ -116,6 +116,7 @@ const Station = () => {
                 </View>
                 
                 <TouchableOpacity onPress={() => router.push({pathname: `/mapa`, params: {lat: station.lat, lng: station.lng}})} className="mt-4">
+                {/* <TouchableOpacity onPress={goMap} className="mt-4"> */}
                     <Widget variant={"filled"}>
                         <Text className="font-semibold text-white text-center">Ver no Mapa</Text>
                     </Widget>

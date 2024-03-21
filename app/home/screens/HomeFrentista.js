@@ -38,6 +38,12 @@ const HomeFrentista = ({ user, setUser }) => {
                     await updateUser(user.docId, {
                         posto: {}
                     })
+                } else {
+                    setUser({
+                        ...user,
+                        posto: specificPosto
+                    })
+                    
                 }
                 let postos = await getPostos()
                 setStations(postos.slice(0, 5))
@@ -101,8 +107,8 @@ const HomeFrentista = ({ user, setUser }) => {
                                     </TouchableOpacity>
                                 </View>
                                     {sales.map((sale) => (
-                                        <Widget key={sale.id} className={"flex flex-row items-center justify-between"} variant={"filled"}>
-                                            <FontAwesome name="check" size={25} />
+                                        <Widget key={sale.id} className={"flex flex-row mb-2 items-center justify-between"} variant={"filled"}>
+                                            <FontAwesome color={"white"} name="check" size={25} />
                                             <View className="flex ml-5 flex-row justify-between grow">
                                                 <View>
                                                     <Text className="font-bold text-white">Cupom {sale.status}  -  #{sale.id}</Text>

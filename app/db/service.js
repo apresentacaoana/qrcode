@@ -74,7 +74,7 @@ const registrarComEmailESenha = async({nome, email, senha, lat, telefone, nascim
                 sendType: 'confirm'
             };
             
-            const url = `https://frochap.vercel.app/api/sendemail`;
+            const url = `https://master--frochap.netlify.app/api/sendemail`;
             await axios.post(url, dados)
             .then(response => {
                 console.log(response.data)
@@ -114,7 +114,7 @@ const recuperarSenha = async (email, setAlert) => {
             sendType: 'change'
         };
         
-        const url = `https://frochap.vercel.app/api/sendemail`;
+        const url = `https://master--frochap.netlify.app/api/sendemail`;
 
         axios.post(url, dados)
             .then(response => {

@@ -236,9 +236,9 @@ const Register = () => {
                 <View className="flex items-center flex-row mb-[6px] mt-3">
                     <Checkbox 
                         className="mr-[8px]"
-                        defaultValue={terms}
+                        value={terms}
                         onValueChange={setTerms}
-                        
+                        style={{width: 30, height: 30}}
                         color={terms ? COLORS.primary : undefined}
                     />
                     <TouchableOpacity onPress={() => router.push('/terms')}>

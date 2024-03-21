@@ -27,14 +27,14 @@ const Config = () => {
     }
 
     async function changeMode() {
+        updateUser(user.docId, {
+            role: user.role == "frentista" ? "normal" : "frentista"
+        })
         setUser({
             ...user,
             role: user.role == "frentista" ? "normal" : "frentista"
         })
-        updateUser(user.docId, {
-            role: user.role == "frentista" ? "normal" : "frentista"
-        })
-        router.replace({pathname: "/login", params: {aviso: "O modo da sua conta foi trocado! Logue novamente."}})
+        router.replace({pathname: "/home", params: {aviso: "O modo da sua conta foi trocado! Logue novamente."}})
     }
 
 

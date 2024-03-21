@@ -22,6 +22,7 @@ const CreateStation = () => {
     const [images, setImages] = useState([])
     const [logo, setLogo] = useState("")
     const textInputRef = useRef();
+    const scrollViewRef = useRef()
     const router = useRouter()
 
     const [nome, setNome] = useState("")
@@ -40,31 +41,50 @@ const CreateStation = () => {
         return numeroAleatorio
     }
 
+    function formatZipCode(zip) {
+        // Aqui você pode implementar a lógica para formatar o CEP
+        // Por exemplo, adicionar hífens quando apropriado
+        const formattedZip = zip.replace(/\D/g, '').slice(0, 8);
+        const firstPart = formattedZip.slice(0, 5);
+        const secondPart = formattedZip.slice(5, 8);
+        return `${firstPart}-${secondPart}`;
+    }
+
     const handleSearch = async (e) => {
-        if(e.length >= 3) {
+        if(e.length >= 5) {
             axios.get(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${e}&language=pt-BR&types=geocode&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
             .then((response) => {
                 let data = response.data
-                console.log(data.predictions)
                 setAddresses(data.predictions)
             })
         }
     }
 
-    const handleSelect = async (item) => {
+    function extractAddressComponent(components, type) {
+        return components.find(component => component.types.includes(type));
+    }
 
+    const handleSelect = async (item) => {
         axios.get(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${item.place_id}&fields=address_components&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
         .then((response) => {
+            console.log(response.data)
             let {result} = response.data
             let {address_components} = result
             console.log(result["address_components"][5]["long_name"])
              
-            let endereco = address_components[0]["long_name"]
-            let bairro = address_components[1]["long_name"]
-            let cidade = address_components[2]["long_name"]
-            let estado = address_components[3]["long_name"]
-            let cep = address_components[5]["long_name"]
-            let pais = address_components[4]["long_name"]
+            const cepComponent = extractAddressComponent(address_components, 'postal_code');
+            const enderecoComponent = extractAddressComponent(address_components, 'route');
+            const bairroComponent = extractAddressComponent(address_components, 'sublocality_level_1');
+            const cidadeComponent = extractAddressComponent(address_components, 'administrative_area_level_2');
+            const estadoComponent = extractAddressComponent(address_components, 'administrative_area_level_1');
+            const paisComponent = extractAddressComponent(address_components, 'country');
+
+            const cep = cepComponent ? cepComponent.long_name : '';
+            const endereco = enderecoComponent ? enderecoComponent.long_name : '';
+            const bairro = bairroComponent ? bairroComponent.long_name : '';
+            const cidade = cidadeComponent ? cidadeComponent.long_name : '';
+            const estado = estadoComponent ? estadoComponent.long_name : '';
+            const pais = paisComponent ? paisComponent.long_name : '';
 
             setCep(cep);
             setCidade(cidade);
@@ -76,17 +96,19 @@ const CreateStation = () => {
       
       }
       
+    function emitAlerta(label) {
+        setAlerta(label)
+        scrollViewRef.current.scrollToEnd({animated: true})
+    }
       
 
     const handleSubmit = async () => {
         setAlerta("")
         if(!nome || !endereco || !bairro || !cidade || !estado || !cep || combustiveis.length <= 0) {
-            setAlerta("Preencha todos os campos")
-            return
+            return emitAlerta("Preencha todos os campos")
         }
         if(!logo) {
-            setAlerta("Envie ao menos a logo")
-            return
+            return emitAlerta("Envie ao menos uma logo")
         }
 
         
@@ -112,22 +134,30 @@ const CreateStation = () => {
         const photoURL = await getDownloadURL(storageRef)
         blob.close()
         
-        axios.get(`https://api.tomtom.com/search/2/geocode/${cep}.json?key=dmyasSSGylyNOd3gN7DuSlNuVKI2hc4u`)
+        axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${cep}&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
         .then(async (response) => {
+            console.log("cheguei aq1")
             let data = response.data
             let {results} = data
-            let resultsInBrazil = results.filter(result => {
-                return result.address.countryCode === "BR";
-            });
             
 
-            if (resultsInBrazil.length > 0) {
-                let { position } = resultsInBrazil[0];
 
-                axios.get(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${position.lat},${position.lon}&radius=5000&type=gas_station&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
+            if (Object.keys(results).length > 0) {
+                let { geometry } = results[0];
+                let { location } = geometry
+                console.log(location)
+                axios.get(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${nome}+${endereco}+${cidade}&key=AIzaSyAJsQjlna7aQk-7UPb-h4H0v1holCNxIno`)
                 .then(async (responseStation) => {
+                    console.log("cheguei aq2")
+                    
                     let {results} = responseStation.data
-                    let stationPosition = results.find(objeto => objeto.name.toLowerCase().includes(nome.toLowerCase()))
+                    console.log("cheguei aq3")
+                    console.log()
+                    let stationPosition = results.find(objeto => String(objeto.name).toLowerCase().includes(nome.toLowerCase()))
+                    if(!stationPosition) {
+                        return emitAlerta("Posto não encontrado, verifique o nome informado.")
+                    }
+                    console.log(stationPosition)
                     await novoPosto({
                         nome,
                         logo: photoURL,
@@ -138,8 +168,8 @@ const CreateStation = () => {
                         estado,
                         endereco,
                         cep,
-                        lat: Object.keys(stationPosition).length > 0 ? stationPosition.geometry.location.lat : position.lat,
-                        lng: Object.keys(stationPosition).length > 0 ? stationPosition.geometry.location.lng : position.lon
+                        lat: Object.keys(stationPosition).length > 0 ? stationPosition.geometry.location.lat : location.lat,
+                        lng: Object.keys(stationPosition).length > 0 ? stationPosition.geometry.location.lng : location.lng
                     });
                     router.replace("/home");
                 })  
@@ -192,7 +222,7 @@ const CreateStation = () => {
         const newCombustiveis = combustiveis;
         newCombustiveis[index][field] = text;
         setCombustiveis(newCombustiveis);
-      };
+    };
 
 
     return (
@@ -200,7 +230,7 @@ const CreateStation = () => {
             <StatusBar />
             <View className="mt-8" />
             <Stack.Screen options={{headerShown: false}} />
-            <ScrollView keyboardShouldPersistTaps="handled" overScrollMode="never" className="flex-1 m-7">
+            <ScrollView ref={scrollViewRef} keyboardShouldPersistTaps="handled" overScrollMode="never" className="flex-1 m-7">
                 <View className="flex flex-row mb-10">
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" color={"#0f0d3c"} size={30} />
@@ -242,12 +272,12 @@ const CreateStation = () => {
                 </View>
                 <View className="mb-[12px] text-[#0f0d3c]">
                     <Text className="text-[16px] text-[#0f0d3c] font-normal my-[8px]">
-                        Endereço
+                        CEP
                     </Text>
                     <View className="w-full h-[48px] border border-[#A0A0A0] rounded-[8px] items-center justify-center pl-[22px]">
                         <TextInput 
                             onChangeText={handleSearch}
-                            placeholder="Insira o endereço"
+                            placeholder="Insira o CEP"
                             placeholderTextColor={"#A0A0A0"}
                             className="w-full text-[#0f0d3c]"
                         />

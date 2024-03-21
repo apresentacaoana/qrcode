@@ -23,7 +23,7 @@ const RecoveryPage = () => {
         if(!email) return setAlert("Informe suas credenciais")
         let user = await getUserByEmail(email)
 
-        const url = `https://frochap.vercel.app/api/sendemail`;
+        const url = `https://master--frochap.netlify.app/api/sendemail`;
 
         axios.post(url, {email: user.id, sendType: "change"})
             .then(response => {

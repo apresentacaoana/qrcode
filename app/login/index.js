@@ -36,7 +36,7 @@ const Login = () => {
 
     useEffect(() => {
         if(aviso) {
-            setAlert("Foi enviado um link de confirmação ao seu email, clique neste link para ativar sua conta")
+            setAlert(aviso)
         }
     }, [])
 

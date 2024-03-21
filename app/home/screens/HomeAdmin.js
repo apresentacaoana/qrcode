@@ -4,7 +4,7 @@ import { View } from "react-native"
 import { EvilIcons, FontAwesome, MaterialIcons } from "@expo/vector-icons"
 import { TouchableOpacity } from "react-native"
 import { useContext, useEffect, useMemo, useState } from "react"
-import { getAlertas, getAllBonus, getPlanos, getPostos, getRequests, getUserByEmail } from "../../db/service"
+import { getAlertas, getAllBonus, getPlanos, getPostos, getRequests, getUserByEmail, getUsers } from "../../db/service"
 import { ScrollView } from "react-native"
 import { RefreshControl } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -29,6 +29,8 @@ const HomeAdmin = ({ user, setUser }) => {
     const [planosContext, setPlanosContext] = useContext(PlanosContext)
     const [bonusContext, setBonusContext] = useContext(BonusContext)
     const [postosContext, setPostosContext] = useContext(PostosContext)
+    const [frentistas, setFrentistas] = useState([])
+    const [usuarios, setUsuarios] = useState([])
     const [loading, setLoading] = useState(true)
 
     const [reload, setReload] = useState(0)
@@ -42,6 +44,7 @@ const HomeAdmin = ({ user, setUser }) => {
             let requests = await getRequests()
             let planos = await getPlanos()
             let bonus = await getAllBonus()
+            const users = await getUsers()
             setPlanos(planos.slice(0, 5))
             setBonus(bonus.slice(0, 5))
             setRequests(requests.slice(0, 5))
@@ -51,6 +54,8 @@ const HomeAdmin = ({ user, setUser }) => {
             setPlanosContext(planos)
             setPostosContext(postos)
             setBonusContext(bonus)
+            setFrentistas(users.filter((user) => user.role == 'frentista').slice(0, 3))
+            setUsuarios(users.filter((user) => user.role == 'normal').slice(0, 3))
 
             setUser(responseUser)
             setLoading(false)
@@ -179,7 +184,7 @@ const HomeAdmin = ({ user, setUser }) => {
         
         
                     </Widget>
-                    <Widget className={"mb-2"}>
+                    {/* <Widget className={"mb-2"}>
                         <View className="flex mb-3 flex-row justify-between items-center">
                             <Text className="text-[#0f0d3c] text-[18px] font-bold">Planos</Text>
                             <TouchableOpacity onPress={() => router.push("/plans")}>
@@ -203,7 +208,7 @@ const HomeAdmin = ({ user, setUser }) => {
                                 </Widget>
                             </TouchableOpacity>
                         ))}
-                    </Widget>
+                    </Widget> */}
                     <Widget className={"mb-2"}>
                         <View className="flex mb-3 flex-row justify-between items-center">
                             <Text className="text-[#0f0d3c] text-[18px] font-bold">Bônus Ativos</Text>
@@ -258,6 +263,21 @@ const HomeAdmin = ({ user, setUser }) => {
                                 <Text className="text-[#0f0d3c] text-[14px]">Ver</Text>
                             </TouchableOpacity>
                         </View>
+                        {frentistas.map(item => (
+                            <TouchableOpacity key={item.id} onPress={() => router.push(`/edit/user/${item.id}`)}>
+                                <Widget className={"flex flex-row mb-1 items-center justify-between"} variant={"filled"}>
+                                    <FontAwesome name="exclamation-circle" size={25} color={"white"} />
+                                    <View className="flex ml-5 flex-row justify-between items-center grow">
+                                        <View>
+                                            <Text className="font-bold text-white">{item.nome}</Text>
+                                        </View>
+                                        <View>
+                                            <Text className="font-bold text-white">Editar</Text>
+                                        </View>
+                                    </View>
+                                </Widget>
+                            </TouchableOpacity>
+                        ))}
                     </Widget>
                     <Widget className={"mb-2"}>
                         <View className="flex mb-3 flex-row justify-between items-center">
@@ -266,6 +286,21 @@ const HomeAdmin = ({ user, setUser }) => {
                                 <Text className="text-[#0f0d3c] text-[14px]">Ver</Text>
                             </TouchableOpacity>
                         </View>
+                        {usuarios.map(item => (
+                            <TouchableOpacity key={item.id} onPress={() => router.push(`/edit/user/${item.id}`)}>
+                                <Widget className={"flex flex-row mb-1 items-center justify-between"} variant={"filled"}>
+                                    <FontAwesome name="exclamation-circle" size={25} color={"white"} />
+                                    <View className="flex ml-5 flex-row justify-between items-center grow">
+                                        <View>
+                                            <Text className="font-bold text-white">{item.nome}</Text>
+                                        </View>
+                                        <View>
+                                            <Text className="font-bold text-white">Editar</Text>
+                                        </View>
+                                    </View>
+                                </Widget>
+                            </TouchableOpacity>
+                        ))}
                     </Widget>
                     <Widget className={"mb-2"}>
                         <View className="flex mb-3 flex-row justify-between items-center">

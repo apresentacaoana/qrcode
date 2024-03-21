@@ -18,15 +18,16 @@ const EditAlerta = () => {
 
     const router = useRouter()
     const [titulo, setTitulo] = useState("")
-    const [dias, setDias] = useState(0)
+    const [dias, setDias] = useState('')
     const [motivo, setMotivo] = useState("")
     const [alerta, setAlerta] = useState("")
 
     const data = useLocalSearchParams()
 
     useEffect(() => {
+        console.log(data)
         setTitulo(data.titulo)
-        setDias(data.dias)
+        setDias(`${data.vezes}`)
         setMotivo(data.conteudo)
     }, [])
 

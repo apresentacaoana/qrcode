@@ -1,5 +1,5 @@
 import { Stack, useRouter } from 'expo-router'
-import React, { useContext, useLayoutEffect, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Ionicons } from "@expo/vector-icons"
 import { SafeAreaView, ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Widget from '../components/Widget'
@@ -15,11 +15,17 @@ const Suporte = () => {
   const [messages, setMessages] = useState([])
   const [content, setContent] = useState('')
   const [user, setUser] = useContext(UserContext)
+  const scrollViewRef = useRef()
 
   async function send() {
     await newMessage({message: content, from: user.docId, to: 'admin'})
     setContent('')
   }
+
+  
+  useEffect(() => {
+    scrollViewRef.current.scrollToEnd({animated: true})
+  }, [messages])
 
   useLayoutEffect(() => {
     const msgQuery = query(
@@ -77,7 +83,7 @@ const Suporte = () => {
               </Widget>
           </View>
 
-          <ScrollView>
+          <ScrollView ref={scrollViewRef}>
             {messages.length > 0 && messages.map((message) => {
               if(message.from == user.docId) {
                 return eu(message)
