@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native"
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useIsFocused } from "@react-navigation/native"
 import Widget from "../components/Widget"
-import { getVendasById, updateVenda } from "../db/service"
+import { getUserById, getVendasById, updateUser, updateVenda } from "../db/service"
 import { UserContext } from "../context/UserContext"
 import { Stack, useRouter } from "expo-router"
 
@@ -40,6 +40,10 @@ const Scan = ({setPageType}) => {
             await updateVenda(venda.docId, {
                 status: "pago",
                 vendedor: user
+            })
+            let responseUser = await getUserById(venda.comprador.id)
+            await updateUser(responseUser.docId, {
+                pontos: Number(responseUser.pontos) + Number(venda.litros)
             })
             router.replace("/home")
         }

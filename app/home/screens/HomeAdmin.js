@@ -4,7 +4,7 @@ import { View } from "react-native"
 import { EvilIcons, FontAwesome, MaterialIcons } from "@expo/vector-icons"
 import { TouchableOpacity } from "react-native"
 import { useContext, useEffect, useMemo, useState } from "react"
-import { getAlertas, getAllBonus, getPlanos, getPostos, getRequests, getUserByEmail, getUsers } from "../../db/service"
+import { getAlertas, getAllBonus, getLojas, getPlanos, getPostos, getRequests, getUserByEmail, getUsers } from "../../db/service"
 import { ScrollView } from "react-native"
 import { RefreshControl } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -22,6 +22,7 @@ const HomeAdmin = ({ user, setUser }) => {
     const router = useRouter()
     const [planos, setPlanos] = useState([])
     const [requests, setRequests] = useState([])
+    const [lojistas, setLojistas] = useState([])
     const [bonus, setBonus] = useState([])
     const [refreshing, setRefreshing] = useState(false)
     const [alertas, setAlertas] = useState([])
@@ -32,6 +33,7 @@ const HomeAdmin = ({ user, setUser }) => {
     const [frentistas, setFrentistas] = useState([])
     const [usuarios, setUsuarios] = useState([])
     const [loading, setLoading] = useState(true)
+    const [lojas, setLojas] = useState([])
 
     const [reload, setReload] = useState(0)
 
@@ -44,6 +46,7 @@ const HomeAdmin = ({ user, setUser }) => {
             let requests = await getRequests()
             let planos = await getPlanos()
             let bonus = await getAllBonus()
+            let lojas = await getLojas()
             const users = await getUsers()
             setPlanos(planos.slice(0, 5))
             setBonus(bonus.slice(0, 5))
@@ -56,6 +59,8 @@ const HomeAdmin = ({ user, setUser }) => {
             setBonusContext(bonus)
             setFrentistas(users.filter((user) => user.role == 'frentista').slice(0, 3))
             setUsuarios(users.filter((user) => user.role == 'normal').slice(0, 3))
+            setLojistas(users.filter((user) => user.role == 'lojista').slice(0, 3))
+            setLojas(lojas.slice(0, 5))
 
             setUser(responseUser)
             setLoading(false)
@@ -184,6 +189,36 @@ const HomeAdmin = ({ user, setUser }) => {
         
         
                     </Widget>
+                    <Widget className={"mb-2"}>
+                        <View className="flex mb-3 flex-row justify-between items-center">
+                            <Text className="text-[#0f0d3c] text-[18px] font-bold">Lojas</Text>
+                            <TouchableOpacity onPress={() => router.push('/lojas')}>
+                                <Text className="text-[#0f0d3c] text-[14px]">Ver tudo</Text>
+                            </TouchableOpacity>
+                        </View>
+                        
+        
+                        {lojas.map((station) => (
+        
+                            <TouchableOpacity key={station.nome} onPress={() => router.push(`/edit/loja/${station.id}`)}>
+                                <Widget className={"flex flex-row mb-1 items-center justify-between"} variant={"filled"}>
+                                    <MaterialIcons color={"white"} name="store" size={25} />
+                                    <View className="flex ml-5 flex-row justify-between items-center grow">
+                                        <View>
+                                            <Text className="font-bold text-white">{station.nome}</Text>
+                                            <Text className=" text-white">{station.endereco}</Text>
+                                        </View>
+                                        <View>
+                                            <Text className="font-bold text-white">Ver</Text>
+                                        </View>
+                                    </View>
+                                </Widget>
+                            </TouchableOpacity>
+                        ))}
+        
+        
+        
+                    </Widget>
                     {/* <Widget className={"mb-2"}>
                         <View className="flex mb-3 flex-row justify-between items-center">
                             <Text className="text-[#0f0d3c] text-[18px] font-bold">Planos</Text>
@@ -288,6 +323,29 @@ const HomeAdmin = ({ user, setUser }) => {
                         </View>
                         {usuarios.map(item => (
                             <TouchableOpacity key={item.id} onPress={() => router.push(`/edit/user/${item.id}`)}>
+                                <Widget className={"flex flex-row mb-1 items-center justify-between"} variant={"filled"}>
+                                    <FontAwesome name="exclamation-circle" size={25} color={"white"} />
+                                    <View className="flex ml-5 flex-row justify-between items-center grow">
+                                        <View>
+                                            <Text className="font-bold text-white">{item.nome}</Text>
+                                        </View>
+                                        <View>
+                                            <Text className="font-bold text-white">Editar</Text>
+                                        </View>
+                                    </View>
+                                </Widget>
+                            </TouchableOpacity>
+                        ))}
+                    </Widget>
+                    <Widget className={"mb-2"}>
+                        <View className="flex mb-3 flex-row justify-between items-center">
+                            <Text className="text-[#0f0d3c] text-[18px] font-bold">Lojistas</Text>
+                            <TouchableOpacity onPress={() => router.push("/lojistas")}>
+                                <Text className="text-[#0f0d3c] text-[14px]">Ver</Text>
+                            </TouchableOpacity>
+                        </View>
+                        {lojistas.map(item => (
+                            <TouchableOpacity key={item.id} onPress={() => router.push(`/edit/lojista/${item.id}`)}>
                                 <Widget className={"flex flex-row mb-1 items-center justify-between"} variant={"filled"}>
                                     <FontAwesome name="exclamation-circle" size={25} color={"white"} />
                                     <View className="flex ml-5 flex-row justify-between items-center grow">

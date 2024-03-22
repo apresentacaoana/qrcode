@@ -23,6 +23,7 @@ const EditUser = () => {
     const [alerta, setAlerta] = useState('')
     const [nome, setNome] = useState('')
     const [email, setEmail] = useState('')
+    const [pontos, setPontos] = useState(0)
     const [litros, setLitros] = useState(0)
     const [litrosBonus, setLitrosBonus] = useState(0)
     const [genero, setGenero] = useState('')
@@ -40,6 +41,7 @@ const EditUser = () => {
             setNome(response.nome)
             setEmail(response.email)
             setLitros(String(response.litros))
+            setPontos(response.pontos)
             setLitrosBonus(String(response.bonus))
             setGenero(response.genero)
             setDataDeNascimento(response.nascimento)
@@ -55,7 +57,7 @@ const EditUser = () => {
             return setAlerta('Não pode haver campos vazios')
         }
         await updateUser(user.docId, {
-            nome, email, litros: Number(litros), bonus: Number(litrosBonus), genero, nascimento: dataDeNascimento, cpf, telefone
+            nome, pontos, email, litros: Number(litros), bonus: Number(litrosBonus), genero, nascimento: dataDeNascimento, cpf, telefone
         })
         return router.back()
     }
@@ -144,6 +146,20 @@ const EditUser = () => {
                             onChangeText={setLitrosBonus}
                             keyboardType="decimal-pad"
                             defaultValue={litrosBonus}
+                        />
+                    </View>
+                </View>
+                <View className="mb-[12px] mt-2 text-[#0f0d3c]">
+                    <Text className="text-[16px] text-[#0f0d3c] font-normal my-[8px]">
+                        Pontos
+                    </Text>
+                    <View className="w-full h-[48px] border border-[#A0A0A0] rounded-[8px] items-center justify-center pl-[22px]">
+                        <TextInput 
+                            placeholderTextColor={"#A0A0A0"}
+                            className="w-full text-[#0f0d3c]"
+                            onChangeText={setPontos}
+                            keyboardType="decimal-pad"
+                            defaultValue={pontos}
                         />
                     </View>
                 </View>

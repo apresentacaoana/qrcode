@@ -6,13 +6,14 @@ import { UserContext } from "../../context/UserContext"
 import { FlatList } from "react-native"
 import Widget from "../../components/Widget"
 import { FontAwesome, Ionicons } from "@expo/vector-icons"
-import { getPlanos } from "../../db/service"
+import { getLojas, getPlanos } from "../../db/service"
 import { getPassedDays } from "../../actions/time"
 import { useRouter } from "expo-router"
 import { PlanosContext } from "../../context/PlanosContext"
 import { ScrollView } from "react-native"
 import LOGO from '../../../assets/logo-bg.png'
 import Navbar from "../../components/Navbar"
+import calcularDistancia from "../../actions/location"
 
 const Plans = () => {
 
@@ -22,12 +23,15 @@ const Plans = () => {
     const [reload, setReload] = useState(0)
     const [refreshing, setRefreshing] = useState(false)
     const [planos, setPlanos] = useContext(PlanosContext)
+    const [lojas, setLojas] = useState([])
 
     useEffect(() => {
         async function getData() {
             let response = await getPlanos()
+            let responseLojas = await getLojas()
             setData(response)
             setPlanos(response)
+            setLojas(responseLojas)
             setRefreshing(false)
         }
         getData()
@@ -55,29 +59,39 @@ const Plans = () => {
                     </View>
                     <ScrollView className=" mx-7 my-20">
                         
-                        <Widget className>
-                            <Text className="text-center">Função em construção.</Text>
+                        <Widget variant={'filled'} className='mb-2'>
+                            <Text className='text-white text-center'>A cada litro que abastece recebe pontos e com eles você consegue desconto em nossas lojas parceiras!</Text>
                         </Widget>
-                        {/* {data.map((item) => (
-                            
-                            <Widget className={`mb-10 self-center justify-self-center w-full`}>
-                                <View className="flex flex-row justify-between items-center">
-                                    <View>
-                                        
-                                    <Text className="text-[#0f0d3c] font-bold text-[25px]">{item.nome}</Text>
-                                    <Text className="text-[#0f0d3c]">{item.litros} Litros</Text>
-                                    </View>
-                                    <Text className="text-[#0f0d3c] text-[18px]">{item.days} dias</Text>
-                                </View>
-                                <Text  className="text-[16px] my-4 mt-7 text-justify opacity-80 text-[#0f0d3c]">{item.descricao}</Text>
-                                <Text className="font-bold -mt-3 text-[#0f0d3c] text-center text-[60px]">R$ {new String(item.price.toFixed(2)).replace('.', ',')}</Text>
-                                <TouchableOpacity onPress={() => router.push({pathname: "/checkout", params: {userId: user.email, planoId: item.id}})} className="mt-4">
-                                    <Widget className={"bg-white py-3"}>
-                                        <Text className="text-center font-bold">Assinar</Text>
-                                    </Widget>
-                                </TouchableOpacity>
+                        
+                        <Widget className={"flex flex-col"}>
+                            <Text className="text-[#0f0d3c]">Você possui</Text>
+                            <View className="flex flex-row items-end -mt-1">
+                                <Text className="text-[#0f0d3c] font-bold text-[42px]">{user.pontos.toFixed(2)}P</Text>
+                            </View>
+                        </Widget>
+
+                        <TouchableOpacity className='my-4' onPress={() => router.push('/extractloja')}>
+                            <Widget variant={"filled"}>
+                                <Text className="text-white font-bold text-center">Ver Extrato</Text>
                             </Widget>
-                        ))} */}
+                        </TouchableOpacity>
+                        
+                        <Widget className='mb-2'>
+                            <Text className="font-bold text-[24px] text-[#0f0d3c]">Lojas Parceiras</Text>
+                        </Widget>
+                        {lojas.map((station) => (
+                            <TouchableOpacity key={station.nome} onPress={() => router.push(`/loja/${station.id}`)}>
+                                <Widget className={"flex flex-row bg-[#F7F7F7] border border-[#262626]"}>
+                                    <View>
+                                        <Image source={{ uri: station.foto }} className="w-[40px] h-[40px] rounded-[10px]" />
+                                    </View>
+                                    <View className="flex flex-col ml-5">
+                                        <Text className="font-bold text-[#0f0d3c]">{station.nome}</Text>
+                                        <Text className="text-[#0f0d3c] font-bold">{calcularDistancia(station.lat, station.lng, user.lat, user.long).km.toFixed(2)}km de distância</Text>
+                                    </View>
+                                </Widget>
+                            </TouchableOpacity>
+                        ))}
                     </ScrollView>
                     </>
                     

@@ -42,7 +42,40 @@ const loginComEmailESenha = async (email, senha, setAlert, navigation, setUser) 
     
 }
 
-const registrarComEmailESenha = async({nome, email, senha, lat, telefone, nascimento, long, role = "normal", cpf, genero, canChange = false}, navigation) => {
+const registrarLojista = async({nome, email, loja, senha, lat = "", telefone = "", nascimento = "", long = "", role = "lojista", cpf = "", genero = "", canChange = false}) => {
+    try {
+        let id = gerarCodigoAleatorio(32)
+        await addDoc(collection(db, "users"), {
+            id,
+            active: true,
+            nome,
+            senha,
+            telefone,
+            nascimento,
+            email,
+            lat,
+            pontos: 0,
+            long,
+            role,
+            bonusId: "",
+            cpf,
+            canChange,
+            genero,
+            plan: "",
+            bonusAtivo: '',
+            subscription_date: "",
+            litros: 100,
+            bonus: 0,
+            loja,
+            descontos: []
+        })
+
+        
+    } catch(e) {console.log(e)}
+}
+
+
+const registrarComEmailESenha = async({nome, email, senha, lat = "", telefone = "", nascimento = "", long = "", role = "normal", cpf = "", genero = "", canChange = false}, navigation) => {
     try {
         let id = gerarCodigoAleatorio(32)
         await addDoc(collection(db, "users"), {
@@ -65,7 +98,10 @@ const registrarComEmailESenha = async({nome, email, senha, lat, telefone, nascim
             subscription_date: "",
             litros: 100,
             bonus: 0,
-            posto: {}
+            pontos: 0,
+            posto: {},
+            loja: '',
+            descontos: [],
         }).then(async () => {
             console.log('usuário criado, o id é: ' + id)
             const dados = {
@@ -271,12 +307,13 @@ const updateVenda = async (docId, data) => {
     } catch(e) {console.log(e)}
 }
 
-const novaVenda = async (id, {posto, comprador, vendedor = {}, gasolina, detalhes, valor, litros, status = "pendente"}) => {
+const novaVenda = async (id, {posto = {}, pontos = 0, comprador = {}, vendedor = {}, loja = {}, gasolina = {}, detalhes = {}, valor = 0, litros = 0, tipo = "litros", status = "pendente"}) => {
     try {
         const vendaRef = collection(db, "vendas")
         await addDoc(vendaRef, {
             id,
             posto,
+            loja,
             comprador,
             vendedor,
             gasolina,
@@ -284,6 +321,9 @@ const novaVenda = async (id, {posto, comprador, vendedor = {}, gasolina, detalhe
             litros,
             detalhes,
             status,
+            pontos,
+            tipo,
+            pontos,
             createdAt: new Date()
         })
     } catch(e) {console.log(e)}
@@ -342,15 +382,17 @@ const getPostoById = async (id) => {
 const getVendasByCompradorId = async (email) => {
     try {
         let vendasRef = collection(db, "vendas")
-        let q = query(vendasRef, where("comprador.email", "==", email))
+        let q = query(vendasRef, orderBy('createdAt', 'desc'))
         let vendas = await getDocs(q)
         let response = []
         vendas.forEach(doc => {
-            let object = {
-                ...doc.data(),
-                docId: doc.id
+            if(doc.data().comprador.email == email) {
+                let object = {
+                    ...doc.data(),
+                    docId: doc.id
+                }
+                response.push(object)
             }
-            response.push(object)
         })
         response.sort((a, b) => b.createdAt - a.createdAt);
         return response
@@ -736,6 +778,74 @@ const desvincularPosto = async (docId) => {
     } catch(e) {console.log(e)}
 }
 
+const criarLoja = async ({nome, foto, endereco, bairro, cep, estado, lat, lng}) => {
+    try {
+        const lojaRef = collection(db, 'lojas')
+        await addDoc(lojaRef, {
+            nome,
+            foto,
+            endereco,
+            bairro,
+            cep,
+            estado,
+            id: gerarCodigoAleatorio(32),
+            lat,
+            lng,
+            createdAt: new Date()
+        })
+    } catch(e) {console.log(e)}
+}
+
+const editLoja = async (docId, data) => {
+    try {
+        const lojaRef = doc(db, "lojas", docId)
+        await updateDoc(lojaRef, {
+            ...data
+        })
+    } catch(e) {console.log(e)}
+}
+
+const getLojas = async () => {
+    try {
+        const lojaRef = collection(db, "lojas")
+        const q = query(lojaRef, orderBy('createdAt', 'asc'))
+        const docs = await getDocs(q)
+        let response = []
+        docs.docs.forEach((doc) => {
+            response.push({
+                ...doc.data(),
+                docId: doc.id
+            })
+        })
+        return response
+    } catch(e) {console.log(e)}
+}
+
+const getLojaById = async (id) => {
+    try {
+        const lojaRef = collection(db, "lojas")
+        const q = query(lojaRef, orderBy('createdAt', 'asc'))
+        const docs = await getDocs(q)
+        let response = {}
+        docs.docs.forEach((doc) => {
+            if(doc.data().id == id) {
+                response = {
+                    ...doc.data(),
+                    docId: doc.id
+                }
+            }
+        })
+        return response
+    } catch(e) {console.log(e)}
+}
+
+const deleteLoja = async (docId) => {
+    try {
+        const lojaRef = doc(db, "lojas", docId)
+        await deleteDoc(lojaRef)
+    } catch(e) {console.log(e)}
+}
+
 const demitir = async (docId) => {
     try {
         let data = await getDoc(db, "users", docId)
@@ -754,4 +864,4 @@ const demitir = async (docId) => {
     } catch(e) {console.log(e)}
 }
 
-export {logout, entrarComGoogle, getMessagesFromBothId, newMessage, getMessagesFromSenderId, getAllMessages, getMessagesFromReceiverId, novoTermo, desvincularPosto, demitir, getUsers, updateTermo, getTermo, getRequestById, novoAlerta, updateAlerta, excluirAlerta, getAlertas, getUserByCPF, excluirBonus, updateVenda, getPostoById, updatePosto, getVendas, getVendasByCompradorId, getAllBonus, novoBonus, getVendasById, getVendasByVendedorId, aceitarRequest, updatePlano, updateBonus, excluirRequest, getRequests, novoRequest, deleteBonus, excluirPlano, novoPlano, getPlanos, excluirPosto, getPostos, novoPosto, getBonusById, getUserById,  novaVenda, updateUser, getUserByEmail, loginComEmailESenha, recuperarSenha, registrarComEmailESenha}
+export {logout, entrarComGoogle, criarLoja, editLoja, getLojaById, getLojas, deleteLoja, getMessagesFromBothId, registrarLojista, newMessage, getMessagesFromSenderId, getAllMessages, getMessagesFromReceiverId, novoTermo, desvincularPosto, demitir, getUsers, updateTermo, getTermo, getRequestById, novoAlerta, updateAlerta, excluirAlerta, getAlertas, getUserByCPF, excluirBonus, updateVenda, getPostoById, updatePosto, getVendas, getVendasByCompradorId, getAllBonus, novoBonus, getVendasById, getVendasByVendedorId, aceitarRequest, updatePlano, updateBonus, excluirRequest, getRequests, novoRequest, deleteBonus, excluirPlano, novoPlano, getPlanos, excluirPosto, getPostos, novoPosto, getBonusById, getUserById,  novaVenda, updateUser, getUserByEmail, loginComEmailESenha, recuperarSenha, registrarComEmailESenha}

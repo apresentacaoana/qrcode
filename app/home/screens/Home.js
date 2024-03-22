@@ -23,6 +23,7 @@ import { FontAwesome } from "@expo/vector-icons"
 import { Alert } from "react-native"
 import Navbar from "../../components/Navbar"
 import LOGO from '../../../assets/logo-bg.png'
+import HomeLojista from "./HomeLojista"
 
 
 const Home = () => {
@@ -125,22 +126,22 @@ const Home = () => {
         });
     };
 
-    const verificarDiferencaEExcluir = async (createdAt, dias, responseBonus, responseUser) => {
-        let userBonus = await getBonusById(responseUser.bonusId)
-        const dataCriacao = moment(getTimestamp(createdAt)).format('L');
-        const dataAtual = moment().format('L');
-        const diferencaEmDias = moment(dataAtual, 'L').diff(moment(dataCriacao, 'L'), 'days');
+    // const verificarDiferencaEExcluir = async (createdAt, dias, responseBonus, responseUser) => {
+    //     let userBonus = await getBonusById(responseUser.bonusId)
+    //     const dataCriacao = moment(getTimestamp(createdAt)).format('L');
+    //     const dataAtual = moment().format('L');
+    //     const diferencaEmDias = moment(dataAtual, 'L').diff(moment(dataCriacao, 'L'), 'days');
 
 
-        if (diferencaEmDias > dias) {
-            await excluirBonus(userBonus.docId);
-            setUser({ ...responseUser, bonus: 0, bonusAtivo: '', bonusId: '' });
-            await updateUser(responseUser.docId, { bonus: 0, bonusAtivo: '', bonusId: '' });
-            setActiveBonus({});
-        }
+    //     if (diferencaEmDias > dias) {
+    //         await excluirBonus(userBonus.docId);
+    //         setUser({ ...responseUser, bonus: 0, bonusAtivo: '', bonusId: '' });
+    //         await updateUser(responseUser.docId, { bonus: 0, bonusAtivo: '', bonusId: '' });
+    //         setActiveBonus({});
+    //     }
 
         
-    };
+    // };
 
     useEffect(() => {
         const getData = async () => {
@@ -150,12 +151,12 @@ const Home = () => {
                 const responseUser = await getUserByEmail(userEmail);
 
 
-                await getAllBonus().then(async (response) => {
-                    if(response.length > 0) {
-                        console.log("passei aq")
-                        await verificarDiferencaEExcluir(response[0].createdAt, Number(response[0].dias), response, responseUser)
-                    }
-                })
+                // await getAllBonus().then(async (response) => {
+                //     if(response.length > 0) {
+                //         console.log("passei aq")
+                //         await verificarDiferencaEExcluir(response[0].createdAt, Number(response[0].dias), response, responseUser)
+                //     }
+                // })
 
                 stationsResponse.sort((postoA, postoB) => {
                     const distanciaA = calcularDistancia(postoA.lat, postoA.lng, responseUser.lat, responseUser.long).km;
@@ -166,14 +167,13 @@ const Home = () => {
                 
                 setUser(responseUser);
                 
-                let userBonus = await getBonusById(responseUser.bonusId)
-                if(Object.keys(userBonus).length == 0) {
-                    setUser({ ...responseUser, bonus: 0, bonusAtivo: '', bonusId: '' });
-                    await updateUser(responseUser.docId, { bonus: 0, bonusAtivo: '', bonusId: '' });
-                }
+                // let userBonus = await getBonusById(responseUser.bonusId)
+                // if(Object.keys(userBonus).length == 0) {
+                //     setUser({ ...responseUser, bonus: 0, bonusAtivo: '', bonusId: '' });
+                //     await updateUser(responseUser.docId, { bonus: 0, bonusAtivo: '', bonusId: '' });
+                // }
 
                 await updateLocation();
-
 
                 setLoading(false);
                 setRefreshing(false);
@@ -233,15 +233,17 @@ const Home = () => {
                                     <View className="w-full flex flex-row pr-3 justify-between items-center">
                                         <View className="flex-row w-full items-center justify-between">
                                             <Text className="text-black text-[25px] font-semibold">Olá, <Text className="text-[#0f0d3c]">{user.nome}</Text></Text>
+                                            {/**
                                             <TouchableOpacity onPress={() => router.push('/mybonus')}>
                                                 <FontAwesome name="gift" color={"#0f0d3c"} size={30} />
                                             </TouchableOpacity>
+                                            */}
                                         </View>
                                         <TouchableOpacity onPress={() => setReload(reload + 1)}>
                                             <Ionicons size={24}  name="refresh" color={"white"}  />
                                         </TouchableOpacity>
                                     </View>
-                                    <Widget className={"flex flex-col"}>
+                                    {/* <Widget className={"flex flex-col"}>
                                         <Text className="text-[#0f0d3c]">Você possui</Text>
                                         <View className="flex flex-row items-end -mt-1">
                                             <Text className="text-[#0f0d3c] font-bold text-[42px]">{user.litros.toFixed(2)}</Text>
@@ -253,7 +255,7 @@ const Home = () => {
                                                 <Text className="font-black ml-1 text-white text-[20px]">{user.bonus.toFixed(2)}L</Text>
                                             </View>
                                         )}
-                                    </Widget>
+                                    </Widget> */}
                                     <Widget>
                                         <View className="flex flex-row justify-between items-center">
                                             <Text className="text-[#0f0d3c] font-bold text-[26px]">Postos de Gasolina</Text>
@@ -292,6 +294,9 @@ const Home = () => {
                        )}
                        {user.role === "admin" && (
                         <HomeAdmin user={user} setUser={setUser} navigation={router} />
+                       )}
+                       {user.role === "lojista" && (
+                        <HomeLojista user={user} setUser={setUser} navigation={router} />
                        )}
 
                     </ScrollView>

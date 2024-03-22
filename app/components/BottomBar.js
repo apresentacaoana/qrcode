@@ -38,6 +38,13 @@ const BottomBar = ({ page, navigation, setPageType }) => {
                     <FontAwesome size={44} name="qrcode" color={page === "plans" ? COLORS.primary : "#FFFFFF"} />
                 </TouchableOpacity>
             )}
+
+            
+            {(user.role === "lojista" && user.loja) && (
+                <TouchableOpacity onPress={() => router.push("/scanlojas")} className="flex flex-col bg-[#0f0d3c] rounded-full absolute left-[47.5%] -translate-x-1/2 h-[70px] -top-[70%] justify-center w-[70px] items-center">
+                    <FontAwesome size={44} name="qrcode" color={page === "plans" ? COLORS.primary : "#FFFFFF"} />
+                </TouchableOpacity>
+            )}
             
             {user.role !== "admin" && (
                 <>
